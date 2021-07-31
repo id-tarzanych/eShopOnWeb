@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.eShopWeb.Infrastructure.Data;
 using Microsoft.eShopWeb.Infrastructure.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,8 +15,9 @@ namespace Microsoft.eShopWeb.Web
     {
         public static async Task Main(string[] args)
         {
-            var host = CreateHostBuilder(args)
-                        .Build();
+            var builder = CreateHostBuilder(args);
+
+            var host = builder.Build();
 
             using (var scope = host.Services.CreateScope())
             {
@@ -42,6 +44,10 @@ namespace Microsoft.eShopWeb.Web
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddEnvironmentVariables();
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

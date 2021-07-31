@@ -43,10 +43,10 @@ namespace Microsoft.eShopWeb.Web
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
             // use in-memory database
-            ConfigureInMemoryDatabases(services);
+            //ConfigureInMemoryDatabases(services);
 
             // use real database
-            //ConfigureProductionServices(services);
+            ConfigureProductionServices(services);
         }
 
         public void ConfigureDockerServices(IServiceCollection services)
@@ -97,7 +97,6 @@ namespace Microsoft.eShopWeb.Web
         {
             services.AddCookieSettings();
 
-
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
@@ -147,6 +146,7 @@ namespace Microsoft.eShopWeb.Web
             
             var baseUrlConfig = new BaseUrlConfiguration();
             Configuration.Bind(BaseUrlConfiguration.CONFIG_NAME, baseUrlConfig);
+            
             services.AddScoped<BaseUrlConfiguration>(sp => baseUrlConfig);
             // Blazor Admin Required Services for Prerendering
             services.AddScoped<HttpClient>(s => new HttpClient
@@ -162,6 +162,16 @@ namespace Microsoft.eShopWeb.Web
             services.AddBlazorServices();
 
             services.AddDatabaseDeveloperPageExceptionFilter();
+
+            services.AddSingleton<OrderProcessingSettings>(sp => {
+                var settings = new OrderProcessingSettings();
+
+                settings.DeliveryOrderProcessorUrl = Configuration.GetValue(typeof(string), "OrdersProcessing:DeliveryOrderUrl") as string;
+                settings.ServiceBusConnectionString = Configuration.GetValue(typeof(string), "OrdersProcessing:ServiceBus:ConnectionString") as string;
+                settings.QueueName = Configuration.GetValue(typeof(string), "OrdersProcessing:ServiceBus:QueueName") as string;
+
+                return settings;
+            });
 
             _services = services; // used to debug registered services
         }

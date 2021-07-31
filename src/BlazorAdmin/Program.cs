@@ -20,7 +20,9 @@ namespace BlazorAdmin
             builder.RootComponents.Add<App>("#admin");
 
             var baseUrlConfig = new BaseUrlConfiguration();
+            builder.Configuration.AddEnvironmentVariables();
             builder.Configuration.Bind(BaseUrlConfiguration.CONFIG_NAME, baseUrlConfig);
+            
             builder.Services.AddScoped<BaseUrlConfiguration>(sp => baseUrlConfig);
 
             builder.Services.AddScoped(sp => new HttpClient() { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
